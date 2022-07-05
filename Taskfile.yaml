@@ -1,0 +1,32 @@
+---
+# https://taskfile.dev
+version: '3'
+
+vars:
+  APPNAME: reactapp
+
+tasks:
+  default:
+    deps:
+      - build-prod
+
+  build-prod:
+    desc: Build the React app using Production variables.
+    cmds:
+      - "podman build --file=containers/Dockerfile \
+         --tag=localhost/{{.APPNAME}}:latest --squash --rm --force-rm ."
+
+  podman-run:
+    desc: Run the React app using Podman.
+    cmds:
+      - "podman run \
+          --rm \
+          --name=\"{{.APPNAME}}\" \
+          --hostname=\"{{.APPNAME}}\" \
+          --publish=\"8080:8080\" \
+          --env=\"inject_arg_philrocksmysocks=PhilIsTheMan\" \
+          --read-only \
+          --mount=\"type=tmpfs,destination=/usr/share/nginx/html\" \
+          --mount=\"type=tmpfs,destination=/var/cache/nginx\" \
+          localhost/{{.APPNAME}}:latest"
+...
